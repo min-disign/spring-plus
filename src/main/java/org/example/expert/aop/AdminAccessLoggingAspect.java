@@ -18,7 +18,7 @@ public class AdminAccessLoggingAspect {
 
     private final HttpServletRequest request;
 
-    @After("execution(* org.example.expert.domain.user.controller.UserController.getUser(..))")
+    @After("execution(* org.example.expert.domain.user.controller.UserAdminController.changeUserRole(..))")
     public void logAfterChangeUserRole(JoinPoint joinPoint) {
         String userId = String.valueOf(request.getAttribute("userId"));
         String requestUrl = request.getRequestURI();
@@ -27,4 +27,5 @@ public class AdminAccessLoggingAspect {
         log.info("Admin Access Log - User ID: {}, Request Time: {}, Request URL: {}, Method: {}",
                 userId, requestTime, requestUrl, joinPoint.getSignature().getName());
     }
+
 }

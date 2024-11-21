@@ -38,14 +38,22 @@ public class AuthService {
         User newUser = new User(
                 signupRequest.getEmail(),
                 encodedPassword,
+                signupRequest.getNickname(), // 닉네임 추가
                 userRole
         );
         User savedUser = userRepository.save(newUser);
 
-        String bearerToken = jwtUtil.createToken(savedUser.getId(), savedUser.getEmail(), userRole);
+        String bearerToken = jwtUtil.createToken(
+                savedUser.getId(),
+                savedUser.getEmail(),
+                savedUser.getUserRole(),
+                savedUser.getNickname() // 닉네임 추가
+        );
 
         return new SignupResponse(bearerToken);
     }
+
+
 
     public SigninResponse signin(SigninRequest signinRequest) {
         User user = userRepository.findByEmail(signinRequest.getEmail()).orElseThrow(

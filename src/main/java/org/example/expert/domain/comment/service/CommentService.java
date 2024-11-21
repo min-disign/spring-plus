@@ -15,8 +15,8 @@ import org.example.expert.domain.user.entity.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -48,18 +48,19 @@ public class CommentService {
     }
 
     public List<CommentResponse> getComments(long todoId) {
-        List<Comment> commentList = commentRepository.findByTodoIdWithUser(todoId);
+        // EntityGraph 적용하여 한 번의 쿼리로 관련된 데이터 로드
+        List<Comment> commentList = commentRepository.findByTodoId(todoId);
 
-        List<CommentResponse> dtoList = new ArrayList<>();
-        for (Comment comment : commentList) {
-            User user = comment.getUser();
-            CommentResponse dto = new CommentResponse(
-                    comment.getId(),
-                    comment.getContents(),
-                    new UserResponse(user.getId(), user.getEmail())
-            );
-            dtoList.add(dto);
-        }
-        return dtoList;
+        // Comment 엔티티를 CommentResponse로 변환
+        return commentList.stream()
+                .map(comment -> {
+                    User user = comment.getUser();
+                    return new CommentResponse(
+                            comment.getId(),
+                            comment.getContents(),
+                            new UserResponse(user.getId(), user.getEmail())
+                    );
+                })
+                .collect(Collectors.toList());
     }
 }
